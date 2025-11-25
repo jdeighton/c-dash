@@ -62,13 +62,17 @@ There are multiple ways to load a CSV file:
 
 ```
 c-dash/
-├── index.html          # Main UI (works in browser and Electron)
-├── main.js             # Electron main process
-├── preload.js          # Electron preload script (secure IPC bridge)
-├── package.json        # Dependencies and build configuration
-├── .gitignore          # Ignores node_modules and build artifacts
-├── README.md           # This file
-└── BUILD.md            # Detailed build and distribution guide
+├── .github/
+│   └── workflows/
+│       └── release.yml     # GitHub Actions workflow for automated releases
+├── index.html              # Main UI (works in browser and Electron)
+├── main.js                 # Electron main process
+├── preload.js              # Electron preload script (secure IPC bridge)
+├── package.json            # Dependencies and build configuration
+├── .gitignore              # Ignores node_modules and build artifacts
+├── README.md               # This file
+├── BUILD.md                # Detailed build and distribution guide
+└── RELEASES.md             # GitHub release creation guide
 ```
 
 ## CSV Format
@@ -108,12 +112,18 @@ npm run build:all    # All platforms (macOS builds require a Mac)
 
 **Output**: Built applications will be in the `dist/` folder (~100-150 MB each)
 
-**To share**: Send the installer/package to users:
+**To share**:
+- **Option 1**: Send installers directly to users
+- **Option 2**: Publish to GitHub Releases (recommended - see [RELEASES.md](RELEASES.md))
+
+**Distribution files**:
 - **Windows**: `CSV Dashboard Setup X.X.X.exe` - double-click to install
 - **macOS**: `CSV Dashboard-X.X.X.dmg` - drag to Applications
 - **Linux**: `CSV Dashboard-X.X.X.AppImage` - make executable and run
 
-For detailed build instructions, code signing, icons, and troubleshooting, see [BUILD.md](BUILD.md)
+**Documentation**:
+- [BUILD.md](BUILD.md) - Detailed build instructions, code signing, icons, and troubleshooting
+- [RELEASES.md](RELEASES.md) - Publishing releases on GitHub (manual and automated)
 
 ## Keyboard Shortcuts
 

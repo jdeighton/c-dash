@@ -164,32 +164,24 @@ Without signing:
 - macOS: "Unidentified developer" warning (users can bypass)
 - Linux: No issues
 
-## CI/CD (GitHub Actions)
+## Publishing to GitHub Releases
 
-You can automate builds with GitHub Actions. Example workflow:
+After building your app, you'll want to publish it so users can download pre-built binaries.
 
-```yaml
-name: Build
-on: [push]
-jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: npm install
-      - run: npm run build
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.os }}-build
-          path: dist/*
-```
+**See [RELEASES.md](RELEASES.md)** for complete instructions on:
+- Creating manual releases on GitHub
+- Using GitHub CLI for quick releases
+- Automated releases with GitHub Actions (already configured!)
+- Release best practices and troubleshooting
+
+**Quick start for automated releases**:
+1. Update version in `package.json`
+2. Commit and create a tag: `git tag v1.0.0 && git push origin v1.0.0`
+3. GitHub Actions automatically builds and publishes the release
 
 ## Further Reading
 
 - [electron-builder documentation](https://www.electron.build/)
 - [Electron app distribution guide](https://www.electronjs.org/docs/latest/tutorial/application-distribution)
 - [Code signing guide](https://www.electron.build/code-signing)
+- [GitHub Releases documentation](https://docs.github.com/en/repositories/releasing-projects-on-github)
