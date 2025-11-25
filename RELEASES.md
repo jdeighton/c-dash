@@ -231,10 +231,39 @@ Make sure the release is published (not in draft mode).
 
 ---
 
+## Code Signing Your Releases
+
+For professional releases without security warnings, you should code sign your applications.
+
+**Without code signing:**
+- Windows shows "Windows protected your PC" SmartScreen warning
+- macOS shows "Unidentified developer" or "App is damaged" warnings
+- Users may be hesitant to install
+
+**With code signing:**
+- Professional, trusted installation experience
+- No security warnings (macOS immediately, Windows after building reputation)
+- Increased user confidence
+
+**Setup:**
+- **Windows**: $200-400/year for code signing certificate
+- **macOS**: $99/year for Apple Developer account + notarization setup
+- **Total**: $300-500/year for both platforms
+
+**See [CODE_SIGNING.md](CODE_SIGNING.md)** for:
+- Step-by-step setup instructions for each platform
+- How to configure electron-builder for signing
+- GitHub Actions integration for automatic signing
+- Testing and troubleshooting
+
+**Recommendation**: Start without signing for early releases. Add code signing when your user base grows and demands professional distribution.
+
+---
+
 ## Next Steps
 
 After your first release:
 - Add auto-update functionality to the app
-- Set up code signing for fewer security warnings
+- Set up code signing for production releases (see [CODE_SIGNING.md](CODE_SIGNING.md))
 - Create a landing page linking to latest release
 - Set up analytics to see download counts

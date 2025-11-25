@@ -33,10 +33,30 @@ jobs:
 
       - name: Build app for Windows
         if: matrix.os == 'windows-latest'
+        # To enable code signing, add these secrets to your repo and uncomment the env section:
+        # WIN_CSC_LINK: Base64-encoded .pfx certificate
+        # WIN_CSC_KEY_PASSWORD: Certificate password
+        # See CODE_SIGNING.md for detailed setup instructions
+        # env:
+        #   WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+        #   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: npm run build:win
 
       - name: Build app for macOS
         if: matrix.os == 'macos-latest'
+        # To enable code signing and notarization, add these secrets and uncomment the env section:
+        # CSC_LINK: Base64-encoded .p12 certificate
+        # CSC_KEY_PASSWORD: Certificate password
+        # APPLE_ID: Your Apple ID email
+        # APPLE_APP_SPECIFIC_PASSWORD: App-specific password from appleid.apple.com
+        # APPLE_TEAM_ID: Your Team ID from developer.apple.com
+        # See CODE_SIGNING.md for detailed setup instructions
+        # env:
+        #   CSC_LINK: ${{ secrets.CSC_LINK }}
+        #   CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        #   APPLE_ID: ${{ secrets.APPLE_ID }}
+        #   APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: npm run build:mac
 
       - name: Upload artifacts

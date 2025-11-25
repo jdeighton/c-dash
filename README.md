@@ -72,7 +72,8 @@ c-dash/
 ├── .gitignore              # Ignores node_modules and build artifacts
 ├── README.md               # This file
 ├── BUILD.md                # Detailed build and distribution guide
-└── RELEASES.md             # GitHub release creation guide
+├── RELEASES.md             # GitHub release creation guide
+└── CODE_SIGNING.md         # Code signing setup for production releases
 ```
 
 ## CSV Format

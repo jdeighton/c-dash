@@ -153,16 +153,26 @@ This is common with unsigned executables. Solutions:
 
 ## Code Signing (Advanced)
 
-For production distribution, you should sign your applications:
+Code signing removes security warnings and builds user trust. **See [CODE_SIGNING.md](CODE_SIGNING.md)** for complete setup instructions.
 
-- **Windows**: Purchase code signing certificate, configure in `package.json`
-- **macOS**: Apple Developer account ($99/year), configure signing identity
-- **Linux**: Not typically required
+**Quick overview:**
 
-Without signing:
-- Windows: SmartScreen warning on first run
-- macOS: "Unidentified developer" warning (users can bypass)
-- Linux: No issues
+- **Windows**: Purchase code signing certificate ($200-400/year)
+  - Without: "Windows protected your PC" SmartScreen warning
+  - With: No warnings (after building reputation)
+
+- **macOS**: Apple Developer account ($99/year) + notarization
+  - Without: "Unidentified developer" / "App is damaged" warnings
+  - With: Smooth installation, no warnings
+
+- **Linux**: Not required
+  - No security warnings regardless of signing
+
+**Costs**: $300-500/year for both Windows and macOS
+
+**When to sign**: Start without signing. Add it when your user base grows and demands professional distribution.
+
+For detailed step-by-step setup, certificates, CI/CD integration, and troubleshooting, see **[CODE_SIGNING.md](CODE_SIGNING.md)**.
 
 ## Publishing to GitHub Releases
 
