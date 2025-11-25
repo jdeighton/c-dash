@@ -483,7 +483,7 @@
 
                 // Create a table from the CSV
                 await conn.query(`DROP TABLE IF EXISTS data`);
-                await conn.query(`CREATE TABLE data AS SELECT * FROM read_csv_auto('${file.name}')`);
+                await conn.query(`CREATE TABLE data AS SELECT * FROM read_csv_auto('${file.name}') WHERE TradeDate IS NOT NULL`);
                 console.log('Table created');
 
                 // Test query
