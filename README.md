@@ -65,9 +65,10 @@ c-dash/
 ├── index.html          # Main UI (works in browser and Electron)
 ├── main.js             # Electron main process
 ├── preload.js          # Electron preload script (secure IPC bridge)
-├── package.json        # Dependencies and scripts
+├── package.json        # Dependencies and build configuration
 ├── .gitignore          # Ignores node_modules and build artifacts
-└── README.md           # This file
+├── README.md           # This file
+└── BUILD.md            # Detailed build and distribution guide
 ```
 
 ## CSV Format
@@ -89,28 +90,30 @@ The application also works in browsers without Electron:
 
 ## Building for Distribution
 
-To package the app for distribution (optional):
+To share this app with users who don't have Node.js installed, build it into a standalone executable:
 
-1. Install electron-builder:
-   ```bash
-   npm install --save-dev electron-builder
-   ```
+```bash
+# Install dependencies first
+npm install
 
-2. Add build scripts to `package.json`:
-   ```json
-   "scripts": {
-     "build:win": "electron-builder --win",
-     "build:mac": "electron-builder --mac",
-     "build:linux": "electron-builder --linux"
-   }
-   ```
+# Build for your current platform
+npm run build
 
-3. Build for your platform:
-   ```bash
-   npm run build:win    # Windows
-   npm run build:mac    # macOS
-   npm run build:linux  # Linux
-   ```
+# Or build for specific platforms
+npm run build:win    # Windows installer + portable .exe
+npm run build:mac    # macOS .dmg and .zip
+npm run build:linux  # Linux AppImage and .deb
+npm run build:all    # All platforms (macOS builds require a Mac)
+```
+
+**Output**: Built applications will be in the `dist/` folder (~100-150 MB each)
+
+**To share**: Send the installer/package to users:
+- **Windows**: `CSV Dashboard Setup X.X.X.exe` - double-click to install
+- **macOS**: `CSV Dashboard-X.X.X.dmg` - drag to Applications
+- **Linux**: `CSV Dashboard-X.X.X.AppImage` - make executable and run
+
+For detailed build instructions, code signing, icons, and troubleshooting, see [BUILD.md](BUILD.md)
 
 ## Keyboard Shortcuts
 
