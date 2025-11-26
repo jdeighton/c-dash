@@ -379,6 +379,18 @@
         let currentData = null;
         let currentChart = null;
 
+        // Check if running in Electron
+        const isElectron = window.electronAPI?.isElectron || false;
+        console.log('Running in Electron:', isElectron);
+
+        // Listen for file opened from Electron menu
+        if (isElectron) {
+            window.electronAPI.onFileOpened(async (fileData) => {
+                console.log('File opened from menu:', fileData.name);
+                await loadCSVFromText(fileData.name, fileData.content);
+            });
+        }
+
         // Initialize DuckDB
         async function initDuckDB() {
             try {
@@ -414,9 +426,18 @@
 
         console.log('Setting up file handlers...');
 
-        dropZone.addEventListener('click', () => {
+        dropZone.addEventListener('click', async () => {
             console.log('Drop zone clicked');
-            fileInput.click();
+            if (isElectron) {
+                // Use Electron's file dialog
+                const result = await window.electronAPI.openFileDialog();
+                if (result.success && !result.canceled) {
+                    await loadCSVFromText(result.name, result.content);
+                }
+            } else {
+                // Use browser file input
+                fileInput.click();
+            }
         });
 
         dropZone.addEventListener('dragover', (e) => {
@@ -456,9 +477,18 @@
         // Load new file button handler
         const loadNewFileBtn = document.getElementById('loadNewFileBtn');
         if (loadNewFileBtn) {
-            loadNewFileBtn.addEventListener('click', () => {
+            loadNewFileBtn.addEventListener('click', async () => {
                 console.log('Load new file button clicked');
-                fileInput.click();
+                if (isElectron) {
+                    // Use Electron's file dialog
+                    const result = await window.electronAPI.openFileDialog();
+                    if (result.success && !result.canceled) {
+                        await loadCSVFromText(result.name, result.content);
+                    }
+                } else {
+                    // Use browser file input
+                    fileInput.click();
+                }
             });
         }
 
@@ -492,6 +522,64 @@
                 console.log('Row count:', count);
 
                 fileInfo.textContent = `✓ Loaded ${file.name} (${count} rows)`;
+
+                // Enable menu items
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.classList.remove('disabled');
+                });
+
+                // Show load new file button
+                const loadNewFileBtn = document.getElementById('loadNewFileBtn');
+                if (loadNewFileBtn) {
+                    loadNewFileBtn.style.display = 'flex';
+                }
+
+                // Hide drop zone and show views
+                document.getElementById('drop-zone-container').classList.add('hidden');
+                document.getElementById('view-container').classList.remove('hidden');
+
+                // Get current active view or default to overview
+                const activeMenuItem = document.querySelector('.menu-item.active');
+                const currentView = activeMenuItem ? activeMenuItem.dataset.view : 'overview';
+
+                // Load the view (current or default)
+                await loadView(currentView);
+            } catch (error) {
+                console.error('Error loading CSV:', error);
+                fileInfo.textContent = '';
+                showError('Error loading CSV: ' + error.message);
+            }
+        }
+
+        // Load CSV from text content (for Electron)
+        async function loadCSVFromText(fileName, textContent) {
+            try {
+                console.log('Loading CSV from text:', fileName);
+                fileInfo.textContent = `Loading ${fileName}...`;
+
+                if (!db) {
+                    const success = await initDuckDB();
+                    if (!success) return;
+                }
+
+                console.log('CSV text loaded, length:', textContent.length);
+                console.log('First 200 chars:', textContent.substring(0, 200));
+
+                // Register the CSV data
+                await db.registerFileText(fileName, textContent);
+                console.log('CSV registered');
+
+                // Create a table from the CSV
+                await conn.query(`DROP TABLE IF EXISTS data`);
+                await conn.query(`CREATE TABLE data AS SELECT * FROM read_csv_auto('${fileName}') WHERE TradeDate IS NOT NULL`);
+                console.log('Table created');
+
+                // Test query
+                const testResult = await conn.query('SELECT COUNT(*) as count FROM data');
+                const count = testResult.toArray()[0].count;
+                console.log('Row count:', count);
+
+                fileInfo.textContent = `✓ Loaded ${fileName} (${count} rows)`;
 
                 // Enable menu items
                 document.querySelectorAll('.menu-item').forEach(item => {

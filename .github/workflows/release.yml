@@ -1,0 +1,97 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  release:
+    name: Build and Release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app for Linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run build:linux
+
+      - name: Build app for Windows
+        if: matrix.os == 'windows-latest'
+        # To enable code signing, add these secrets to your repo and uncomment the env section:
+        # WIN_CSC_LINK: Base64-encoded .pfx certificate
+        # WIN_CSC_KEY_PASSWORD: Certificate password
+        # See CODE_SIGNING.md for detailed setup instructions
+        # env:
+        #   WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+        #   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        run: npm run build:win
+
+      - name: Build app for macOS
+        if: matrix.os == 'macos-latest'
+        # To enable code signing and notarization, add these secrets and uncomment the env section:
+        # CSC_LINK: Base64-encoded .p12 certificate
+        # CSC_KEY_PASSWORD: Certificate password
+        # APPLE_ID: Your Apple ID email
+        # APPLE_APP_SPECIFIC_PASSWORD: App-specific password from appleid.apple.com
+        # APPLE_TEAM_ID: Your Team ID from developer.apple.com
+        # See CODE_SIGNING.md for detailed setup instructions
+        # env:
+        #   CSC_LINK: ${{ secrets.CSC_LINK }}
+        #   CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        #   APPLE_ID: ${{ secrets.APPLE_ID }}
+        #   APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        #   APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: npm run build:mac
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.os }}-build
+          path: dist/*
+          retention-days: 5
+
+  create-release:
+    name: Create GitHub Release
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Display structure of downloaded files
+        run: ls -R artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
