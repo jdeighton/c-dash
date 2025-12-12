@@ -379,6 +379,13 @@
         let currentData = null;
         let currentChart = null;
 
+        // Configuration for highlighting date ranges in daily volume chart
+        // Format: array of {start: 'YYYY-MM-DD', end: 'YYYY-MM-DD'} objects
+        const highlightedDateRanges = [
+            {start: '2025-01-16', end: '2025-01-20'},
+            {start: '2025-02-01', end: '2025-02-05'}
+        ];
+
         // Check if running in Electron
         const isElectron = window.electronAPI?.isElectron || false;
         console.log('Running in Electron:', isElectron);
@@ -712,6 +719,19 @@
             `);
             const chartData = result.toArray();
 
+            // Generate colors based on highlighted date ranges
+            const backgroundColors = chartData.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 0.8)'  // Red for highlighted dates
+                    : 'rgba(52, 152, 219, 0.8)'  // Blue for normal dates
+            );
+            
+            const borderColors = chartData.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 1)'     // Red border for highlighted dates
+                    : 'rgba(52, 152, 219, 1)'     // Blue border for normal dates
+            );
+
             const ctx = document.getElementById('overviewChart').getContext('2d');
             currentChart = new Chart(ctx, {
                 type: 'bar',
@@ -720,8 +740,8 @@
                     datasets: [{
                         label: 'Total Daily Volume',
                         data: chartData.map(row => row.total_volume),
-                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
                         borderWidth: 2
                     }]
                 },
@@ -753,6 +773,16 @@
             });
         }
 
+        // Helper function to check if a date falls within any highlighted range
+        function isDateHighlighted(dateString) {
+            const date = new Date(dateString);
+            return highlightedDateRanges.some(range => {
+                const startDate = new Date(range.start);
+                const endDate = new Date(range.end);
+                return date >= startDate && date <= endDate;
+            });
+        }
+
         // Render daily volume chart
         async function renderDailyVolume(container) {
             console.log('Rendering daily volume...');
@@ -772,6 +802,19 @@
             `);
             const chartData = result.toArray();
 
+            // Generate colors based on highlighted date ranges
+            const backgroundColors = chartData.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 0.8)'  // Red for highlighted dates
+                    : 'rgba(52, 152, 219, 0.8)'  // Blue for normal dates
+            );
+            
+            const borderColors = chartData.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 1)'     // Red border for highlighted dates
+                    : 'rgba(52, 152, 219, 1)'     // Blue border for normal dates
+            );
+
             const ctx = document.getElementById('dailyVolumeChart').getContext('2d');
             currentChart = new Chart(ctx, {
                 type: 'bar',
@@ -780,8 +823,8 @@
                     datasets: [{
                         label: 'Total Daily Volume',
                         data: chartData.map(row => row.total_volume),
-                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
                         borderWidth: 2
                     }]
                 },
@@ -1140,6 +1183,19 @@
                 document.querySelector('[data-view="table"]').classList.add('active');
             });
 
+            // Generate colors based on highlighted date ranges
+            const backgroundColors = data.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 0.8)'  // Red for highlighted dates
+                    : 'rgba(52, 152, 219, 0.8)'  // Blue for normal dates
+            );
+            
+            const borderColors = data.map(row => 
+                isDateHighlighted(row.formatted_date) 
+                    ? 'rgba(231, 76, 60, 1)'     // Red border for highlighted dates
+                    : 'rgba(52, 152, 219, 1)'     // Blue border for normal dates
+            );
+
             const ctx = document.getElementById('accountVolumeChart').getContext('2d');
             currentChart = new Chart(ctx, {
                 type: 'bar',
@@ -1148,8 +1204,8 @@
                     datasets: [{
                         label: 'Total Volume',
                         data: data.map(row => row.total_volume),
-                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
-                        borderColor: 'rgba(52, 152, 219, 1)',
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
                         borderWidth: 2
                     }]
                 },
